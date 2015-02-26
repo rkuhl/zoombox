@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html class="no-skrollr">
+<head>
+	<meta charset="utf-8" />
+	<title>ZoomBox by Roman Kühl - Example</title>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<script src="jquery.min.js" type="text/javascript"></script>
+	<script src="../src/jquery-zoombox.js" type="text/javascript"></script>
+</head>
+<body>
+	<div id="zoom-box" data-zoom-src="../assets/bondi-beach.jpg"></div>
+	<p>click on image to zoom</p>
+	<script>
+		$(document).ready(function() {
+			$("#zoom-box").zoomBox({dev: true});
+		});
+	</script>
+</body>
+</html>
