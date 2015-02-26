@@ -118,8 +118,8 @@
       if (settings.clickToggle) {
         $zb.on("click", function(e) {
           e.preventDefault();
-          startX = e.pageX - $zb.offset().left;
-          startY = e.pageY - $zb.offset().top;
+          startX = e.pageX;
+          startY = e.pageY;
           return toggleMode();
         });
       }

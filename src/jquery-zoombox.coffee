@@ -112,8 +112,8 @@
 		if settings.clickToggle
 			$zb.on "click", (e)->
 				e.preventDefault()
-				startX = e.pageX - $zb.offset().left
-				startY = e.pageY - $zb.offset().top
+				startX = e.pageX
+				startY = e.pageY
 				toggleMode()
 
 		# init #
