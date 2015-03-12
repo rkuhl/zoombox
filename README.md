@@ -42,9 +42,9 @@ Options
 
 Example 2
 ---
-```  
 JS:  
 ```javascript
+
 $(document).ready(function() {
 	$(".zoom-box-2").zoomBox({
 		clickToggle: true,
