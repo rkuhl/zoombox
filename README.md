@@ -35,5 +35,23 @@ $(document).ready(function() {
 Options
 ---
 ```clickToggle``` if false the box is not clickable, default true   
+```zoomRanges``` if more than 1 zoom + / - controls are added, default 1   
+```zoomInLabel``` zoom in label, default '+'   
+```zoomOutLabel``` zoom out label, default '-'   
 ```dev``` if true some messages are logged into the console  
 
+Example 2
+---
+```  
+JS:  
+```javascript
+$(document).ready(function() {
+	$(".zoom-box-2").zoomBox({
+		clickToggle: true,
+		zoomRanges: 4,
+		zoomInLabel: 'zoom in',
+		zoomOutLabel: 'zoom out',
+		dev: true
+	});
+});
+```
