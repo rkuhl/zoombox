@@ -146,6 +146,7 @@
         if (settings.zoomRanges < 2) {
           return false;
         }
+        zoomRange = 1;
         $zoomIn.remove();
         $zoomOut.remove();
         return $zoomControls.remove();

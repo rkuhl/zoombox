@@ -84,6 +84,7 @@
 				$img = $('<img src="' + src + '" alt="" class="zb-full" />')
 				$zb.append $img
 				oryginalImageWidth = $img.width()
+				setOryginalImageWidth()
 				# callback ? #
 				if typeof callback is "function"
 					callback()
@@ -134,13 +135,14 @@
 			$zoomControls.append($zoomIn)
 			$zoomControls.append($zoomOut)
 			$zb.append($zoomControls)
-		# remove +/- #
+		# remove +/- , reset zoomRange to 1 #
 		removeZoomRangeControls = ()->
 			if settings.zoomRanges < 2
-				return false;	
-			$zoomIn.remove();
-			$zoomOut.remove();
-			$zoomControls.remove();
+				return false
+			zoomRange = 1
+			$zoomIn.remove()
+			$zoomOut.remove()
+			$zoomControls.remove()
 
 		# zoom range controls +/- event listeners #
 		addZoomEventListeners = ()->
@@ -172,10 +174,14 @@
 			updateFullImageWidth()
 			updateZoomRangeControlsState()
 
+		# set oryginal image width #
+		setOryginalImageWidth = ()->
+			return $img.css "width", oryginalImageWidth + "px"	
+
 		# update full image width - zoomRange #
 		updateFullImageWidth = ()->
 			if zoomRange == 1
-				return $img.css "width", "auto"	
+				return setOryginalImageWidth()
 			dif = oryginalImageWidth - ($zb.width() + (oryginalImageWidth - $zb.width()) * 0.1);
 			leap = dif / settings.zoomRanges
 			w = oryginalImageWidth - leap * zoomRange
