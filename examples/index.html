@@ -8,12 +8,28 @@
 	<script src="../src/jquery-zoombox.js" type="text/javascript"></script>
 </head>
 <body>
-	<div id="zoom-box" data-zoom-src="../assets/bondi-beach.jpg"></div>
-	<p>click on image to zoom</p>
-	<script>
-		$(document).ready(function() {
-			$("#zoom-box").zoomBox({dev: true});
-		});
-	</script>
+	<div class="container">
+		<!-- ### Basic Setup ### -->
+		<h3>Basic setup</h3>
+		<div class="zoom-box zoom-box-1" data-zoom-src="../assets/xl.jpg"></div>
+		<p>click on image to zoom</p>
+		<script>
+			$(document).ready(function() {
+				$(".zoom-box-1").zoomBox({dev: true});
+			});
+		</script>
+		<!-- ### /Basic Setup ### -->
+		
+		<!-- ### Zoom ranges ### -->
+		<h3>Zoom ranges (+/-)</h3>
+		<div class="zoom-box zoom-box-2" data-zoom-src="../assets/xl.jpg"></div>
+		<p>click on image to zoom</p>
+		<script>
+			$(document).ready(function() {
+				$(".zoom-box-2").zoomBox({dev: true, zoomRanges: 4});
+			});
+		</script>
+		<!-- ### /Zoom ranges ### -->
+	</div>
 </body>
 </html>

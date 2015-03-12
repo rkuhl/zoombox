@@ -2,15 +2,23 @@
 (function() {
   (function($) {
     return $.fn.zoomBox = function(options) {
-      var $img, $zb, addEventListeners, getFullImageSrc, init, loadFullImage, modeChangeStart, modeChangeStop, moveImage, onMouseMove, readyToZoom, removeEventListeners, settings, startX, startY, toggleMode, trace, zoomOff, zoomOn;
+      var $img, $zb, $zoomControls, $zoomIn, $zoomOut, addEventListeners, addZoomEventListeners, addZoomRangeControls, buildZoomRangeControls, getFullImageSrc, init, loadFullImage, modeChangeStart, modeChangeStop, moveImage, onMouseMove, oryginalImageWidth, readyToZoom, removeEventListeners, removeZoomRangeControls, settings, startX, startY, toggleMode, trace, updateFullImageWidth, updateZoomRangeControlsState, zoomIn, zoomOff, zoomOn, zoomOut, zoomRange;
       settings = $.extend({
         'dev': false,
-        'clickToggle': true
+        'clickToggle': true,
+        'zoomRanges': 1,
+        'zoomInLabel': '+',
+        'zoomOutLabel': '-'
       }, options);
       $zb = this;
       $img = null;
+      $zoomControls = null;
+      $zoomIn = null;
+      $zoomOut = null;
       startX = 0;
       startY = 0;
+      zoomRange = 1;
+      oryginalImageWidth = 0;
       trace = function(str) {
         if (settings.dev) {
           return console.info(str);
@@ -37,6 +45,7 @@
       zoomOff = function() {
         trace("zoom off");
         modeChangeStart();
+        removeZoomRangeControls();
         $zb.removeClass('zb-zoom-on');
         removeEventListeners();
         return modeChangeStop();
@@ -52,6 +61,7 @@
       };
       readyToZoom = function() {
         trace("ready to zoom");
+        addZoomRangeControls();
         addEventListeners();
         moveImage(startX, startY);
         return $zb.addClass('zb-zoom-on');
@@ -79,6 +89,7 @@
           $zb.addClass("zb-loaded");
           $img = $('<img src="' + src + '" alt="" class="zb-full" />');
           $zb.append($img);
+          oryginalImageWidth = $img.width();
           if (typeof callback === "function") {
             return callback();
           }
@@ -114,6 +125,82 @@
       };
       $.fn.zoomBox.toggle = function() {
         return toggleMode();
+      };
+      addZoomRangeControls = function() {
+        if (settings.zoomRanges < 2) {
+          return false;
+        }
+        buildZoomRangeControls();
+        updateZoomRangeControlsState();
+        return addZoomEventListeners();
+      };
+      buildZoomRangeControls = function() {
+        $zoomControls = $('<div class="zb-zoom-controls"></div>');
+        $zoomIn = $('<div class="zb-zoom-control zb-zoom-in">' + settings.zoomInLabel + '</div>');
+        $zoomOut = $('<div class="zb-zoom-control zb-zoom-out">' + settings.zoomOutLabel + '</div>');
+        $zoomControls.append($zoomIn);
+        $zoomControls.append($zoomOut);
+        return $zb.append($zoomControls);
+      };
+      removeZoomRangeControls = function() {
+        if (settings.zoomRanges < 2) {
+          return false;
+        }
+        $zoomIn.remove();
+        $zoomOut.remove();
+        return $zoomControls.remove();
+      };
+      addZoomEventListeners = function() {
+        $zoomIn.on("click", function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          return zoomIn();
+        });
+        return $zoomOut.on("click", function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          return zoomOut();
+        });
+      };
+      zoomIn = function() {
+        if (zoomRange === 1) {
+          return false;
+        }
+        zoomRange--;
+        trace("zoom in: " + zoomRange);
+        updateFullImageWidth();
+        return updateZoomRangeControlsState();
+      };
+      zoomOut = function() {
+        if (zoomRange === settings.zoomRanges) {
+          return false;
+        }
+        zoomRange++;
+        trace("zoom out: " + zoomRange);
+        updateFullImageWidth();
+        return updateZoomRangeControlsState();
+      };
+      updateFullImageWidth = function() {
+        var dif, leap, w;
+        if (zoomRange === 1) {
+          return $img.css("width", "auto");
+        }
+        dif = oryginalImageWidth - ($zb.width() + (oryginalImageWidth - $zb.width()) * 0.1);
+        leap = dif / settings.zoomRanges;
+        w = oryginalImageWidth - leap * zoomRange;
+        return $img.css("width", w + "px");
+      };
+      updateZoomRangeControlsState = function() {
+        if (zoomRange === 1) {
+          $zoomIn.removeClass('active');
+        } else {
+          $zoomIn.addClass('active');
+        }
+        if (zoomRange === settings.zoomRanges) {
+          return $zoomOut.removeClass('active');
+        } else {
+          return $zoomOut.addClass('active');
+        }
       };
       if (settings.clickToggle) {
         $zb.on("click", function(e) {

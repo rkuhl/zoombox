@@ -3,11 +3,19 @@
 		settings = $.extend {
 				'dev'			: false			# is developer envoirment? (trace msgs)
 				'clickToggle'	: true			# clicking box toggles zoom mode
+				'zoomRanges'	: 1				# + / - controls added if > 1
+				'zoomInLabel'	: '+'			# zoom in label
+				'zoomOutLabel'	: '-'			# zoom out label
 			}, options
 		$zb = this
 		$img = null
+		$zoomControls = null
+		$zoomIn = null
+		$zoomOut = null
 		startX = 0
 		startY = 0
+		zoomRange = 1
+		oryginalImageWidth = 0
 		
 		# console.info if dev = true #
 		trace = (str)->
@@ -33,6 +41,7 @@
 		zoomOff = ()->
 			trace "zoom off"
 			modeChangeStart()
+			removeZoomRangeControls()
 			$zb.removeClass('zb-zoom-on')
 			removeEventListeners()
 			modeChangeStop()
@@ -47,6 +56,7 @@
 
 		readyToZoom = ()->
 			trace "ready to zoom"
+			addZoomRangeControls()
 			addEventListeners()
 			moveImage(startX, startY)
 			$zb.addClass('zb-zoom-on')
@@ -72,7 +82,8 @@
 				$zb.removeClass "zb-loading"
 				$zb.addClass "zb-loaded"
 				$img = $('<img src="' + src + '" alt="" class="zb-full" />')
-				$zb.append $img					
+				$zb.append $img
+				oryginalImageWidth = $img.width()
 				# callback ? #
 				if typeof callback is "function"
 					callback()
@@ -107,7 +118,83 @@
 		$.fn.zoomBox.toggle = ()->
 			toggleMode()
 
+
+		# create zoom range +/- controls and add event listeners #
+		addZoomRangeControls = ()->
+			if settings.zoomRanges < 2
+				return false;	
+			buildZoomRangeControls()
+			updateZoomRangeControlsState()
+			addZoomEventListeners()
+		# build +/- #
+		buildZoomRangeControls = ()->
+			$zoomControls = $('<div class="zb-zoom-controls"></div>')
+			$zoomIn = $('<div class="zb-zoom-control zb-zoom-in">' + settings.zoomInLabel + '</div>')
+			$zoomOut = $('<div class="zb-zoom-control zb-zoom-out">' + settings.zoomOutLabel + '</div>')
+			$zoomControls.append($zoomIn)
+			$zoomControls.append($zoomOut)
+			$zb.append($zoomControls)
+		# remove +/- #
+		removeZoomRangeControls = ()->
+			if settings.zoomRanges < 2
+				return false;	
+			$zoomIn.remove();
+			$zoomOut.remove();
+			$zoomControls.remove();
+
+		# zoom range controls +/- event listeners #
+		addZoomEventListeners = ()->
+			$zoomIn.on "click", (e)->
+				e.preventDefault()
+				e.stopPropagation()
+				zoomIn()
+			$zoomOut.on "click", (e)->
+				e.preventDefault()
+				e.stopPropagation()
+				zoomOut()
 		
+		
+		# zoom in #
+		zoomIn = ()->
+			if zoomRange == 1
+				return false
+			zoomRange--
+			trace "zoom in: " + zoomRange
+			updateFullImageWidth()
+			updateZoomRangeControlsState()
+
+		# zoom out #
+		zoomOut = ()->
+			if zoomRange == settings.zoomRanges
+				return false
+			zoomRange++
+			trace "zoom out: " + zoomRange
+			updateFullImageWidth()
+			updateZoomRangeControlsState()
+
+		# update full image width - zoomRange #
+		updateFullImageWidth = ()->
+			if zoomRange == 1
+				return $img.css "width", "auto"	
+			dif = oryginalImageWidth - ($zb.width() + (oryginalImageWidth - $zb.width()) * 0.1);
+			leap = dif / settings.zoomRanges
+			w = oryginalImageWidth - leap * zoomRange
+			$img.css "width", w + "px"
+
+
+		# zoom range controls +/- state .active
+		updateZoomRangeControlsState = ()->
+			if zoomRange == 1
+				$zoomIn.removeClass('active')
+			else
+				$zoomIn.addClass('active')
+			
+			if zoomRange == settings.zoomRanges
+				$zoomOut.removeClass('active')
+			else
+				$zoomOut.addClass('active')
+
+
 		# on click ? #
 		if settings.clickToggle
 			$zb.on "click", (e)->
