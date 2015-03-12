@@ -42,11 +42,45 @@ Options
 
 Example 2
 ---
+CSS:    
+```css
+#zoom-box {
+	width: 700px;
+	height: 400px;
+	overflow: hidden;
+	background: #ececec url('../assets/s.jpg') no-repeat 50% 50%;
+	background-size: cover;
+	cursor: pointer;
+	position: relative;
+}
+#zoom-box img.zb-full {
+	display: none;
+	position: absolute;
+}
+#zoom-box.zb-zoom-on img.zb-full {
+	display: block;
+}
+.zb-zoom-controls {
+	position: absolute;
+	z-index: 2;
+}
+.zb-zoom-control {
+	text-align: center;
+	width: 10px;	
+	padding: 2px 6px;
+	margin: 5px;
+	background-color: rgba(255,255,255,.5);
+	cursor: default;
+}
+.zb-zoom-control.active {
+	background-color: white;
+	cursor: pointer;
+}
+```  
 JS:  
 ```javascript
-
 $(document).ready(function() {
-	$(".zoom-box-2").zoomBox({
+	$("#zoom-box").zoomBox({
 		clickToggle: true,
 		zoomRanges: 4,
 		zoomInLabel: 'zoom in',
