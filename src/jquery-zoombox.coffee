@@ -14,7 +14,7 @@
 		$zoomOut = null
 		startX = 0
 		startY = 0
-		zoomRange = 1
+		zoomRange = settings.zoomRanges
 		oryginalImageWidth = 0
 		
 		# console.info if dev = true #
@@ -127,6 +127,7 @@
 			buildZoomRangeControls()
 			updateZoomRangeControlsState()
 			addZoomEventListeners()
+			updateFullImageWidth()
 		# build +/- #
 		buildZoomRangeControls = ()->
 			$zoomControls = $('<div class="zb-zoom-controls"></div>')
@@ -139,7 +140,7 @@
 		removeZoomRangeControls = ()->
 			if settings.zoomRanges < 2
 				return false
-			zoomRange = 1
+			zoomRange = settings.zoomRanges
 			$zoomIn.remove()
 			$zoomOut.remove()
 			$zoomControls.remove()
