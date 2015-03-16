@@ -1,11 +1,11 @@
 jquery-zoombox.js
 ===========
 jQuery plugin that will let you preview a zoomed image within a box.  
-Reference: [Canyon.com](https://www.canyon.com/en/mountainbikes/bike.html?b=3665)
-by [Roman Kühl](http://www.kuhl.pl).  
+By [Roman Kühl](http://www.kuhl.pl).  
 
 Example
 ---
+Check out the [example](http://kuhl.pl/github/zoombox/).  
 HTML:    
 ```html
 <script src="jquery.js" type="text/javascript"></script>  
