@@ -6,6 +6,7 @@
 				'zoomRanges'	: 1				# + / - controls added if > 1
 				'zoomInLabel'	: '+'			# zoom in label
 				'zoomOutLabel'	: '-'			# zoom out label
+				'draggable'		: false			# drag !depends on jquery-ui Draggable!
 			}, options
 		$zb = this
 		$img = null
@@ -63,7 +64,10 @@
 
 		addEventListeners = ()->
 			trace "add event listeners"
-			$zb.on "mousemove", onMouseMove
+			if settings.draggable
+				imageDraggable()				
+			else
+				$zb.on "mousemove", onMouseMove
 
 		removeEventListeners = ()->
 			trace "remove event listeners"
@@ -93,7 +97,24 @@
 				$zb.addClass "zb-error"
 			img.src = src
 
+		# Draggable #
+		imageDraggable = ()->
+			$img.draggable({containment: getBounds()});
 
+		getBounds = ()->
+			difX = $img.width() - $zb.width()
+			difY = $img.height() - $zb.height()
+			x2 = $zb.offset().left
+			y2 = $zb.offset().top
+			x1 = x2 - difX
+			y1 = y2 - difY
+
+			arr = [x1, y1, x2, y2]
+			trace arr
+			return arr
+
+
+		# MouseMove #
 		onMouseMove = (e)->			
 			moveImage(e.pageX, e.pageY)
 
@@ -165,6 +186,8 @@
 			trace "zoom in: " + zoomRange
 			updateFullImageWidth()
 			updateZoomRangeControlsState()
+			if (settings.draggable)
+				updateDraggable()
 
 		# zoom out #
 		zoomOut = ()->
@@ -174,6 +197,8 @@
 			trace "zoom out: " + zoomRange
 			updateFullImageWidth()
 			updateZoomRangeControlsState()
+			if (settings.draggable)
+				updateDraggable()
 
 		# set oryginal image width #
 		setOryginalImageWidth = ()->
@@ -186,7 +211,7 @@
 			dif = oryginalImageWidth - ($zb.width() + (oryginalImageWidth - $zb.width()) * 0.1);
 			leap = dif / settings.zoomRanges
 			w = oryginalImageWidth - leap * zoomRange
-			$img.css "width", w + "px"
+			$img.css "width", w + "px"			
 
 
 		# zoom range controls +/- state .active
@@ -201,6 +226,8 @@
 			else
 				$zoomOut.addClass('active')
 
+		updateDraggable = ()->
+			imageDraggable()
 
 		# on click ? #
 		if settings.clickToggle

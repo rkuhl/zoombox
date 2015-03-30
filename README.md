@@ -38,6 +38,7 @@ Options
 ```zoomRanges``` if more than 1 zoom + / - controls are added, default 1   
 ```zoomInLabel``` zoom in label, default '+'   
 ```zoomOutLabel``` zoom out label, default '-'   
+```draggable``` use drag and drop interface (depends on jquery-ui Draggable) '-'   
 ```dev``` if true some messages are logged into the console  
 
 Example 2
@@ -85,6 +86,7 @@ $(document).ready(function() {
 		zoomRanges: 4,
 		zoomInLabel: 'zoom in',
 		zoomOutLabel: 'zoom out',
+		draggable: true,
 		dev: true
 	});
 });

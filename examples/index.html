@@ -5,6 +5,7 @@
 	<title>ZoomBox by Roman Kühl - Example</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<script src="jquery.min.js" type="text/javascript"></script>
+	<script src="jquery-ui.min.js" type="text/javascript"></script>
 	<script src="../src/jquery-zoombox.js" type="text/javascript"></script>
 </head>
 <body>
@@ -30,6 +31,18 @@
 		<script>
 			$(document).ready(function() {
 				$(".zoom-box-2").zoomBox({dev: true, zoomRanges: 4});
+			});
+		</script>
+		<!-- ### /Zoom ranges ### -->
+
+		<!-- ### Draggable ranges ### -->
+		<h3>Draggable</h3>
+		<h6>Dependency: jquery-ui Draggable plugin</h6>
+		<div class="zoom-box zoom-box-3" data-zoom-src="../assets/xl.jpg"></div>
+		<p>click on image to zoom</p>
+		<script>
+			$(document).ready(function() {
+				$(".zoom-box-3").zoomBox({dev: true, draggable: true});
 			});
 		</script>
 		<!-- ### /Zoom ranges ### -->
