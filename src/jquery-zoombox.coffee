@@ -108,11 +108,7 @@
 			y2 = $zb.offset().top
 			x1 = x2 - difX
 			y1 = y2 - difY
-
-			arr = [x1, y1, x2, y2]
-			trace arr
-			return arr
-
+			return [x1, y1, x2, y2]
 
 		# MouseMove #
 		onMouseMove = (e)->			
@@ -211,7 +207,13 @@
 			dif = oryginalImageWidth - ($zb.width() + (oryginalImageWidth - $zb.width()) * 0.1);
 			leap = dif / settings.zoomRanges
 			w = oryginalImageWidth - leap * zoomRange
-			$img.css "width", w + "px"			
+			$img.css "width", w + "px"
+			resetImagePosition()
+
+		# check if image is not outside of bounds #
+		resetImagePosition = ()->			
+			$img.css "left", "0px"
+			$img.css "top", "0px"
 
 
 		# zoom range controls +/- state .active
@@ -227,6 +229,7 @@
 				$zoomOut.addClass('active')
 
 		updateDraggable = ()->
+			$img.draggable( 'destroy' )
 			imageDraggable()
 
 		# on click ? #

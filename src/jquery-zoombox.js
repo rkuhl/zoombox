@@ -2,7 +2,7 @@
 (function() {
   (function($) {
     return $.fn.zoomBox = function(options) {
-      var $img, $zb, $zoomControls, $zoomIn, $zoomOut, addEventListeners, addZoomEventListeners, addZoomRangeControls, buildZoomRangeControls, getBounds, getFullImageSrc, imageDraggable, init, loadFullImage, modeChangeStart, modeChangeStop, moveImage, onMouseMove, oryginalImageWidth, readyToZoom, removeEventListeners, removeZoomRangeControls, setOryginalImageWidth, settings, startX, startY, toggleMode, trace, updateDraggable, updateFullImageWidth, updateZoomRangeControlsState, zoomIn, zoomOff, zoomOn, zoomOut, zoomRange;
+      var $img, $zb, $zoomControls, $zoomIn, $zoomOut, addEventListeners, addZoomEventListeners, addZoomRangeControls, buildZoomRangeControls, getBounds, getFullImageSrc, imageDraggable, init, loadFullImage, modeChangeStart, modeChangeStop, moveImage, onMouseMove, oryginalImageWidth, readyToZoom, removeEventListeners, removeZoomRangeControls, resetImagePosition, setOryginalImageWidth, settings, startX, startY, toggleMode, trace, updateDraggable, updateFullImageWidth, updateZoomRangeControlsState, zoomIn, zoomOff, zoomOn, zoomOut, zoomRange;
       settings = $.extend({
         'dev': false,
         'clickToggle': true,
@@ -112,16 +112,14 @@
         });
       };
       getBounds = function() {
-        var arr, difX, difY, x1, x2, y1, y2;
+        var difX, difY, x1, x2, y1, y2;
         difX = $img.width() - $zb.width();
         difY = $img.height() - $zb.height();
         x2 = $zb.offset().left;
         y2 = $zb.offset().top;
         x1 = x2 - difX;
         y1 = y2 - difY;
-        arr = [x1, y1, x2, y2];
-        trace(arr);
-        return arr;
+        return [x1, y1, x2, y2];
       };
       onMouseMove = function(e) {
         return moveImage(e.pageX, e.pageY);
@@ -222,7 +220,12 @@
         dif = oryginalImageWidth - ($zb.width() + (oryginalImageWidth - $zb.width()) * 0.1);
         leap = dif / settings.zoomRanges;
         w = oryginalImageWidth - leap * zoomRange;
-        return $img.css("width", w + "px");
+        $img.css("width", w + "px");
+        return resetImagePosition();
+      };
+      resetImagePosition = function() {
+        $img.css("left", "0px");
+        return $img.css("top", "0px");
       };
       updateZoomRangeControlsState = function() {
         if (zoomRange === 1) {
@@ -237,6 +240,7 @@
         }
       };
       updateDraggable = function() {
+        $img.draggable('destroy');
         return imageDraggable();
       };
       if (settings.clickToggle) {
