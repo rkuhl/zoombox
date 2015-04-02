@@ -2,7 +2,7 @@
 (function() {
   (function($) {
     return $.fn.zoomBox = function(options) {
-      var $img, $zb, $zoomControls, $zoomIn, $zoomOut, addEventListeners, addZoomEventListeners, addZoomRangeControls, buildZoomRangeControls, getBounds, getFullImageSrc, imageDraggable, init, loadFullImage, modeChangeStart, modeChangeStop, moveImage, onMouseMove, oryginalImageWidth, readyToZoom, removeEventListeners, removeZoomRangeControls, resetImagePosition, setOryginalImageWidth, settings, startX, startY, toggleMode, trace, updateDraggable, updateFullImageWidth, updateZoomRangeControlsState, zoomIn, zoomOff, zoomOn, zoomOut, zoomRange;
+      var $img, $zb, $zoomControls, $zoomIn, $zoomOut, addEventListeners, addZoomEventListeners, addZoomRangeControls, buildZoomRangeControls, getBounds, getFullImageSrc, imageDraggable, init, isImageInBounds, loadFullImage, modeChangeStart, modeChangeStop, moveImage, onMouseMove, oryginalImageWidth, readyToZoom, removeEventListeners, removeZoomRangeControls, resetImagePosition, setOryginalImageWidth, settings, startX, startY, toggleMode, trace, updateDraggable, updateFullImageWidth, updateZoomRangeControlsState, zoomIn, zoomOff, zoomOn, zoomOut, zoomRange;
       settings = $.extend({
         'dev': false,
         'clickToggle': true,
@@ -121,6 +121,36 @@
         y1 = y2 - difY;
         return [x1, y1, x2, y2];
       };
+      isImageInBounds = function() {
+        var bounds, imgX, imgY;
+        bounds = getBounds();
+        imgX = $img.offset().left;
+        imgY = $img.offset().top;
+        if (imgX < bounds[0] || imgX > bounds[2] || imgY < bounds[1] || imgY > bounds[3]) {
+          return false;
+        }
+        return true;
+      };
+      resetImagePosition = function() {
+        var bounds, imgX, imgY;
+        if (!isImageInBounds()) {
+          bounds = getBounds();
+          imgX = $img.offset().left;
+          imgY = $img.offset().top;
+          if (imgX < bounds[0]) {
+            $img.css("left", bounds[0] + "px");
+          }
+          if (imgX > bounds[2]) {
+            $img.css("left", bounds[2] + "px");
+          }
+          if (imgY < bounds[1]) {
+            $img.css("top", bounds[1] + "px");
+          }
+          if (imgY > bounds[3]) {
+            return $img.css("top", bounds[3] + "px");
+          }
+        }
+      };
       onMouseMove = function(e) {
         return moveImage(e.pageX, e.pageY);
       };
@@ -222,10 +252,6 @@
         w = oryginalImageWidth - leap * zoomRange;
         $img.css("width", w + "px");
         return resetImagePosition();
-      };
-      resetImagePosition = function() {
-        $img.css("left", "0px");
-        return $img.css("top", "0px");
       };
       updateZoomRangeControlsState = function() {
         if (zoomRange === 1) {

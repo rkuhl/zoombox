@@ -109,6 +109,32 @@
 			x1 = x2 - difX
 			y1 = y2 - difY
 			return [x1, y1, x2, y2]
+		
+		# check if image is not outside of bounds #
+		isImageInBounds = ()->
+			bounds = getBounds()
+			imgX = $img.offset().left
+			imgY = $img.offset().top
+			if imgX < bounds[0] or imgX > bounds[2] or imgY < bounds[1] or imgY > bounds[3]
+				return false
+			return true
+		
+		# if image offset is outside bounds it's top and left are updated
+		# (eg. zoom out on a edge)
+		resetImagePosition = ()->			
+			# trace "is image in bounds: "
+			if not isImageInBounds()
+				bounds = getBounds()
+				imgX = $img.offset().left
+				imgY = $img.offset().top
+				if imgX < bounds[0]
+					$img.css "left", bounds[0] + "px"
+				if imgX > bounds[2]
+					$img.css "left", bounds[2] + "px"
+				if imgY < bounds[1]
+					$img.css "top", bounds[1] + "px"
+				if imgY > bounds[3]
+					$img.css "top", bounds[3] + "px"
 
 		# MouseMove #
 		onMouseMove = (e)->			
@@ -210,10 +236,6 @@
 			$img.css "width", w + "px"
 			resetImagePosition()
 
-		# check if image is not outside of bounds #
-		resetImagePosition = ()->			
-			$img.css "left", "0px"
-			$img.css "top", "0px"
 
 
 		# zoom range controls +/- state .active
