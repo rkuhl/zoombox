@@ -25,7 +25,7 @@
 
 		toggleMode = ()->			
 			if $zb.hasClass('zb-error')
-				trace ('cannot toggle; the image was not found!')
+				trace ('cannot toggle; the image was not found or image was to small!')
 				return
 			trace ("zoom image toggle mode")
 			if $zb.hasClass('zb-zoom-on')
@@ -76,6 +76,14 @@
 		getFullImageSrc = ()->
 			return $zb.data "zoom-src"
 
+		checkFullImageSize = ()->
+			if $img.width() < $zb.width()
+				trace "Ups, full image width is less than box width"
+				return false
+			if $img.height() < $zb.height()
+				trace "Ups, full image height is less than box height"
+				return false
+			return true
 		loadFullImage = (callback)->			
 			$zb.addClass "zb-loading"
 			src = getFullImageSrc()
@@ -87,8 +95,13 @@
 				$zb.addClass "zb-loaded"
 				$img = $('<img src="' + src + '" alt="" class="zb-full" />')
 				$zb.append $img
-				oryginalImageWidth = $img.width()
+				oryginalImageWidth = $img.width()				
 				setOryginalImageWidth()
+				# check if img is larger then the box #
+				if not checkFullImageSize()
+					trace "full image did not pass the size test"
+					$zb.addClass "zb-error"
+					return false;				
 				# callback ? #
 				if typeof callback is "function"
 					callback()
@@ -110,11 +123,16 @@
 			y1 = y2 - difY
 			return [x1, y1, x2, y2]
 		
+		getRelativeBounds = ()->
+			difX = $img.width() - $zb.width()
+			difY = $img.height() - $zb.height()
+			return [-difX, -difY, 0, 0]
+
 		# check if image is not outside of bounds #
 		isImageInBounds = ()->
-			bounds = getBounds()
-			imgX = $img.offset().left
-			imgY = $img.offset().top
+			bounds = getRelativeBounds()
+			imgX = $img.position().left
+			imgY = $img.position().top
 			if imgX < bounds[0] or imgX > bounds[2] or imgY < bounds[1] or imgY > bounds[3]
 				return false
 			return true
@@ -124,17 +142,21 @@
 		resetImagePosition = ()->			
 			# trace "is image in bounds: "
 			if not isImageInBounds()
-				bounds = getBounds()
-				imgX = $img.offset().left
-				imgY = $img.offset().top
+				bounds = getRelativeBounds()
+				imgX = $img.position().left
+				imgY = $img.position().top
 				if imgX < bounds[0]
 					$img.css "left", bounds[0] + "px"
+					trace "imgX was: " + imgX + ", updated to: " + bounds[0]
 				if imgX > bounds[2]
 					$img.css "left", bounds[2] + "px"
+					trace "imgX was: " + imgX + ", updated to: " + bounds[2]
 				if imgY < bounds[1]
 					$img.css "top", bounds[1] + "px"
+					trace "imgY was: " + imgY + ", updated to: " + bounds[1]
 				if imgY > bounds[3]
 					$img.css "top", bounds[3] + "px"
+					trace "imgY was: " + imgY + ", updated to: " + bounds[3]
 
 		# MouseMove #
 		onMouseMove = (e)->			
@@ -204,24 +226,26 @@
 		zoomIn = ()->
 			if zoomRange == 1
 				return false
+			modeChangeStart()
 			zoomRange--
 			trace "zoom in: " + zoomRange
 			updateFullImageWidth()
 			updateZoomRangeControlsState()
 			if (settings.draggable)
 				updateDraggable()
-
+			modeChangeStop()
 		# zoom out #
 		zoomOut = ()->
 			if zoomRange == settings.zoomRanges
 				return false
+			modeChangeStart()
 			zoomRange++
 			trace "zoom out: " + zoomRange
 			updateFullImageWidth()
 			updateZoomRangeControlsState()
 			if (settings.draggable)
 				updateDraggable()
-
+			modeChangeStop()
 		# set oryginal image width #
 		setOryginalImageWidth = ()->
 			return $img.css "width", oryginalImageWidth + "px"	

@@ -2,7 +2,7 @@
 (function() {
   (function($) {
     return $.fn.zoomBox = function(options) {
-      var $img, $zb, $zoomControls, $zoomIn, $zoomOut, addEventListeners, addZoomEventListeners, addZoomRangeControls, buildZoomRangeControls, getBounds, getFullImageSrc, imageDraggable, init, isImageInBounds, loadFullImage, modeChangeStart, modeChangeStop, moveImage, onMouseMove, oryginalImageWidth, readyToZoom, removeEventListeners, removeZoomRangeControls, resetImagePosition, setOryginalImageWidth, settings, startX, startY, toggleMode, trace, updateDraggable, updateFullImageWidth, updateZoomRangeControlsState, zoomIn, zoomOff, zoomOn, zoomOut, zoomRange;
+      var $img, $zb, $zoomControls, $zoomIn, $zoomOut, addEventListeners, addZoomEventListeners, addZoomRangeControls, buildZoomRangeControls, checkFullImageSize, getBounds, getFullImageSrc, getRelativeBounds, imageDraggable, init, isImageInBounds, loadFullImage, modeChangeStart, modeChangeStop, moveImage, onMouseMove, oryginalImageWidth, readyToZoom, removeEventListeners, removeZoomRangeControls, resetImagePosition, setOryginalImageWidth, settings, startX, startY, toggleMode, trace, updateDraggable, updateFullImageWidth, updateZoomRangeControlsState, zoomIn, zoomOff, zoomOn, zoomOut, zoomRange;
       settings = $.extend({
         'dev': false,
         'clickToggle': true,
@@ -27,7 +27,7 @@
       };
       toggleMode = function() {
         if ($zb.hasClass('zb-error')) {
-          trace('cannot toggle; the image was not found!');
+          trace('cannot toggle; the image was not found or image was to small!');
           return;
         }
         trace("zoom image toggle mode");
@@ -82,6 +82,17 @@
       getFullImageSrc = function() {
         return $zb.data("zoom-src");
       };
+      checkFullImageSize = function() {
+        if ($img.width() < $zb.width()) {
+          trace("Ups, full image width is less than box width");
+          return false;
+        }
+        if ($img.height() < $zb.height()) {
+          trace("Ups, full image height is less than box height");
+          return false;
+        }
+        return true;
+      };
       loadFullImage = function(callback) {
         var img, src;
         $zb.addClass("zb-loading");
@@ -96,6 +107,11 @@
           $zb.append($img);
           oryginalImageWidth = $img.width();
           setOryginalImageWidth();
+          if (!checkFullImageSize()) {
+            trace("full image did not pass the size test");
+            $zb.addClass("zb-error");
+            return false;
+          }
           if (typeof callback === "function") {
             return callback();
           }
@@ -121,11 +137,17 @@
         y1 = y2 - difY;
         return [x1, y1, x2, y2];
       };
+      getRelativeBounds = function() {
+        var difX, difY;
+        difX = $img.width() - $zb.width();
+        difY = $img.height() - $zb.height();
+        return [-difX, -difY, 0, 0];
+      };
       isImageInBounds = function() {
         var bounds, imgX, imgY;
-        bounds = getBounds();
-        imgX = $img.offset().left;
-        imgY = $img.offset().top;
+        bounds = getRelativeBounds();
+        imgX = $img.position().left;
+        imgY = $img.position().top;
         if (imgX < bounds[0] || imgX > bounds[2] || imgY < bounds[1] || imgY > bounds[3]) {
           return false;
         }
@@ -134,20 +156,24 @@
       resetImagePosition = function() {
         var bounds, imgX, imgY;
         if (!isImageInBounds()) {
-          bounds = getBounds();
-          imgX = $img.offset().left;
-          imgY = $img.offset().top;
+          bounds = getRelativeBounds();
+          imgX = $img.position().left;
+          imgY = $img.position().top;
           if (imgX < bounds[0]) {
             $img.css("left", bounds[0] + "px");
+            trace("imgX was: " + imgX + ", updated to: " + bounds[0]);
           }
           if (imgX > bounds[2]) {
             $img.css("left", bounds[2] + "px");
+            trace("imgX was: " + imgX + ", updated to: " + bounds[2]);
           }
           if (imgY < bounds[1]) {
             $img.css("top", bounds[1] + "px");
+            trace("imgY was: " + imgY + ", updated to: " + bounds[1]);
           }
           if (imgY > bounds[3]) {
-            return $img.css("top", bounds[3] + "px");
+            $img.css("top", bounds[3] + "px");
+            return trace("imgY was: " + imgY + ", updated to: " + bounds[3]);
           }
         }
       };
@@ -219,25 +245,29 @@
         if (zoomRange === 1) {
           return false;
         }
+        modeChangeStart();
         zoomRange--;
         trace("zoom in: " + zoomRange);
         updateFullImageWidth();
         updateZoomRangeControlsState();
         if (settings.draggable) {
-          return updateDraggable();
+          updateDraggable();
         }
+        return modeChangeStop();
       };
       zoomOut = function() {
         if (zoomRange === settings.zoomRanges) {
           return false;
         }
+        modeChangeStart();
         zoomRange++;
         trace("zoom out: " + zoomRange);
         updateFullImageWidth();
         updateZoomRangeControlsState();
         if (settings.draggable) {
-          return updateDraggable();
+          updateDraggable();
         }
+        return modeChangeStop();
       };
       setOryginalImageWidth = function() {
         return $img.css("width", oryginalImageWidth + "px");
